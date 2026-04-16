@@ -1,0 +1,36 @@
+services:
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  vector-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      S3V_S3_ENDPOINT: minio:9000
+      S3V_S3_ACCESS_KEY: minioadmin
+      S3V_S3_SECRET_KEY: minioadmin
+      S3V_S3_BUCKET: vector-store
+      S3V_S3_USE_SSL: "false"
+      S3V_SNAPSHOT_INTERVAL_SECONDS: "30"
+      S3V_LOG_LEVEL: INFO
+    depends_on:
+      minio:
+        condition: service_healthy
+
+volumes:
+  minio-data:
