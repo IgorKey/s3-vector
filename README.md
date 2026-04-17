@@ -189,6 +189,8 @@ docker compose up -d
 curl http://localhost:8000/health
 
 # Запустить демо (создаст коллекцию, загрузит векторы, выполнит поиск)
+python3 -m venv .venv
+source .venv/bin/activate
 pip install httpx numpy
 python -m demo.demo
 ```
@@ -210,6 +212,10 @@ python -m demo.demo
 ## Тесты
 
 ```bash
+# Создать и активировать venv (если ещё не создан)
+python3 -m venv .venv
+source .venv/bin/activate
+
 # Установить зависимости
 pip install -e ".[dev]"
 
